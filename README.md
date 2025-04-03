@@ -1,70 +1,44 @@
-# Getting Started with Create React App
+### Explicando o teste unitário que se encontra no diretório src/App.test.js
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+✅ import { render, screen } from "@testing-library/react";
 
-## Available Scripts
+    render: simula a renderização do componente na tela (como se ele estivesse aparecendo no navegador).
 
-In the project directory, you can run:
+    screen: permite acessar os elementos que foram renderizados.
 
-### `npm start`
+✅ import App from "./App";
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in your browser.
+    Está importando o seu componente App para ser testado.
 
-The page will reload when you make changes.\
-You may also see any lint errors in the console.
+✅ test("renders Hello World text", () => { ... });
 
-### `npm test`
+    Essa é a definição de um teste unitário.
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+    A primeira parte ("renders Hello World text") é a descrição do que o teste deve fazer.
 
-### `npm run build`
+    A segunda parte (a função) contém a lógica do teste.
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
+✅ render(<App />);
 
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
+    Aqui o componente App é renderizado em um ambiente de teste.
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+    É como se você abrisse a página do seu app no navegador.
 
-### `npm run eject`
+✅ const helloWorldText = screen.getByText(/hello world./i);
 
-**Note: this is a one-way operation. Once you `eject`, you can't go back!**
+    Essa linha procura na tela renderizada um elemento que contenha o texto "Hello World.".
 
-If you aren't satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
+    O /hello world./i é uma expressão regular:
 
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you're on your own.
+        O i no final quer dizer que a busca ignora maiúsculas/minúsculas.
 
-You don't have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn't feel obligated to use this feature. However we understand that this tool wouldn't be useful if you couldn't customize it when you are ready for it.
+✅ expect(helloWorldText).toBeInTheDocument();
 
-## Learn More
+    Aqui é onde o teste de verdade acontece.
 
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
+    Ele está dizendo: “Espero que o elemento com o texto 'Hello World.' esteja presente no documento”.
 
-To learn React, check out the [React documentation](https://reactjs.org/).
+📌 Resultado
 
-### Code Splitting
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/code-splitting](https://facebook.github.io/create-react-app/docs/code-splitting)
-
-### Analyzing the Bundle Size
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size](https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size)
-
-### Making a Progressive Web App
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app](https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app)
-
-### Advanced Configuration
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/advanced-configuration](https://facebook.github.io/create-react-app/docs/advanced-configuration)
-
-### Deployment
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/deployment](https://facebook.github.io/create-react-app/docs/deployment)
-
-### `npm run build` fails to minify
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
+Se o texto "Hello World." existir na tela renderizada pelo App, o teste passa ✅
+Se não existir, o teste falha ❌
