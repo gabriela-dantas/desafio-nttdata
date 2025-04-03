@@ -55,3 +55,19 @@ jobs:
           publish_dir: ./build
           publish_branch: main
 
+      - name: Enviar e-mail em caso de falha
+        if: failure()
+        uses: dawidd6/action-send-mail@v3
+        with:
+          server_address: smtp.gmail.com
+          server_port: 587
+          username: ${{ secrets.EMAIL_USERNAME }}
+          password: ${{ secrets.EMAIL_PASSWORD }}
+          subject: "🚨 CI/CD Falhou no Repositório ${{ github.repository }}"
+          body: |
+            O pipeline falhou na etapa: ${{ github.job }}
+            Commit: ${{ github.sha }}
+            Autor: ${{ github.actor }}
+            Veja mais detalhes: https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}
+          to: ${{ secrets.EMAIL_DEV }}
+          from: ${{ secrets.EMAIL_USERNAME }}
