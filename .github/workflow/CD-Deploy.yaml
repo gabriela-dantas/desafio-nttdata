@@ -1,0 +1,55 @@
+name: Deploy Page React Hello World
+
+on:
+  push:
+    branches:
+      - main  # Agora dispara na branch main
+
+permissions:
+  id-token: write
+  contents: read
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout do código
+        uses: actions/checkout@v4
+
+      - name: Instalar dependências
+        run: npm install
+
+      - name: Executar testes
+        run: npm test
+
+      - name: Construir aplicação
+        run: npm run build
+
+      - name: Criar Release no GitHub
+        uses: softprops/action-gh-release@v1
+        with:
+          tag_name: v1.0.${{ github.run_number }}
+          name: "Release v1.0.${{ github.run_number }}"
+          draft: false
+          prerelease: false
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment: production
+
+    steps:
+      - name: Checkout do código
+        uses: actions/checkout@v4
+
+      - name: Configurar GitHub Pages
+        uses: actions/configure-pages@v3
+
+      - name: Fazer Deploy no GitHub Pages
+        uses: peaceiris/actions-gh-pages@v3
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./build
