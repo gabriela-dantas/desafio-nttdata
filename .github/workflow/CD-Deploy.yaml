@@ -24,38 +24,45 @@ jobs:
         run: npm test
 
       - name: Construir aplicação
+        run: npm run build
+
+      - name: Renomear build para docs
         run: |
-          npm run build
           mv build docs
-          touch docs/.nojekyll  # Desativa o Jekyll para evitar erro no GitHub Pages
+          touch docs/.nojekyll  # Desativando Jekyll
 
       - name: Verificar conteúdo da pasta docs
         run: ls -l docs
 
-      - name: Criar Release no GitHub
-        uses: softprops/action-gh-release@v1
+      - name: Armazenar arquivos da build
+        uses: actions/upload-artifact@v4
         with:
-          tag_name: v1.0.${{ github.run_number }}
-          name: "Release v1.0.${{ github.run_number }}"
-          draft: false
-          prerelease: false
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          name: react-app
+          path: docs
 
   deploy:
     needs: build
     runs-on: ubuntu-latest
-    environment: github-pages
-
     steps:
       - name: Checkout do código
         uses: actions/checkout@v4
 
-      - name: Fazer Deploy no GitHub Pages
+      - name: Baixar build gerada no job build
+        uses: actions/download-artifact@v4
+        with:
+          name: react-app
+          path: docs
+
+      - name: Verificar conteúdo da pasta docs
+        run: ls -l docs
+
+      - name: Publicar no GitHub Pages (sem Jekyll)
         uses: peaceiris/actions-gh-pages@v3
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           publish_dir: ./docs
+          keep_files: true
+          allow_empty_commit: true
 
   notify_failure:
     if: ${{ failure() }}
