@@ -18,82 +18,85 @@ jobs:
       - name: Checkout do código
         uses: actions/checkout@v4
 
-      - name: Instalar dependências
-        run: npm install
+      - name: Hello World
+        run: echo Hello, world!
 
-      - name: Executar testes
-        run: npm test
+      # - name: Instalar dependências
+      #   run: npm install
 
-      - name: Construir aplicação
-        run: npm run build
+      # - name: Executar testes
+      #   run: npm test
 
-      - name: Criar Release no GitHub
-        uses: softprops/action-gh-release@v1
-        with:
-          tag_name: v1.0.${{ github.run_number }}
-          name: "Release v1.0.${{ github.run_number }}"
-          draft: false
-          prerelease: false
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      
-      # - name: Send mail
-      #   if: always()
-      #   uses: dawidd6/action-send-mail@v2
+      # - name: Construir aplicação
+      #   run: npm run build
+
+      # - name: Criar Release no GitHub
+      #   uses: softprops/action-gh-release@v1
       #   with:
-      #     # mail server settings
-      #     server_address: smtp.gmail.com
-      #     server_port: 465
-      #     # user credentials
-      #     username: ${{ secrets.EMAIL_USERNAME }}
-      #     password: ${{ secrets.EMAIL_PASSWORD }}
-      #     # email subject
-      #     subject: ${{ github.job }} job of ${{ github.repository }} has ${{ job.status }}
-      #     # email body as text
-      #     body: ${{ github.job }} job in worflow ${{ github.workflow }} of ${{ github.repository }} has ${{ job.status }}
-      #     # comma-separated string, send email to
-      #     to: gabizinha477@gmail.com,gabrieladantasvasconcelos@gmail.com
-      #     # from email name
-      #     from: John Doe
-
- 
-  deploy:
-    needs: build
-    runs-on: ubuntu-latest
-    environment: github-pages
-
-    steps:
-      - name: Checkout do código
-        uses: actions/checkout@v4
-
-      - name: Configurar GitHub Pages
-        uses: actions/configure-pages@v3
-
-      - name: Fazer Deploy no GitHub Pages (branch main)
-        uses: peaceiris/actions-gh-pages@v3
-        with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-          #publish_dir: ./docs
-
-
+      #     tag_name: v1.0.${{ github.run_number }}
+      #     name: "Release v1.0.${{ github.run_number }}"
+      #     draft: false
+      #     prerelease: false
+      #   env:
+      #     GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       
-  notify_failure:
-    if: ${{ always() }}
-    runs-on: ubuntu-latest
-    needs: [build, deploy] # Garante que será executado se qualquer um dos jobs falhar
-    steps:
-      - name: Enviar e-mail em caso de falha
-        uses: dawidd6/action-send-mail@v4
+      - name: Send mail
+        if: always()
+        uses: dawidd6/action-send-mail@v2
         with:
+          # mail server settings
           server_address: smtp.gmail.com
-          server_port: 587
+          server_port: 465
+          # user credentials
           username: ${{ secrets.EMAIL_USERNAME }}
           password: ${{ secrets.EMAIL_PASSWORD }}
-          subject: "🚨 CI/CD Falhou no Repositório ${{ github.repository }}"
-          body: |
-            O pipeline falhou na etapa: ${{ github.job }}
-            Commit: ${{ github.sha }}
-            Autor: ${{ github.actor }}
-            Veja mais detalhes: https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}
-          to: gabizinha477@gmail.com,gabrieladantasvasconcelos@gmail.com #${{ secrets.EMAIL_DEV }}
-          from: notifications@github.com   # ${{ secrets.EMAIL_USERNAME }}  #   
+          # email subject
+          subject: ${{ github.job }} job of ${{ github.repository }} has ${{ job.status }}
+          # email body as text
+          body: ${{ github.job }} job in worflow ${{ github.workflow }} of ${{ github.repository }} has ${{ job.status }}
+          # comma-separated string, send email to
+          to: gabizinha477@gmail.com,gabrieladantasvasconcelos@gmail.com
+          # from email name
+          from: John Doe
+
+ 
+  # deploy:
+  #   needs: build
+  #   runs-on: ubuntu-latest
+  #   environment: github-pages
+
+  #   steps:
+  #     - name: Checkout do código
+  #       uses: actions/checkout@v4
+
+  #     - name: Configurar GitHub Pages
+  #       uses: actions/configure-pages@v3
+
+  #     - name: Fazer Deploy no GitHub Pages (branch main)
+  #       uses: peaceiris/actions-gh-pages@v3
+  #       with:
+  #         github_token: ${{ secrets.GITHUB_TOKEN }}
+  #         #publish_dir: ./docs
+
+
+      
+  # notify_failure:
+  #   if: ${{ always() }}
+  #   runs-on: ubuntu-latest
+  #   needs: [build, deploy] # Garante que será executado se qualquer um dos jobs falhar
+  #   steps:
+  #     - name: Enviar e-mail em caso de falha
+  #       uses: dawidd6/action-send-mail@v4
+  #       with:
+  #         server_address: smtp.gmail.com
+  #         server_port: 587
+  #         username: ${{ secrets.EMAIL_USERNAME }}
+  #         password: ${{ secrets.EMAIL_PASSWORD }}
+  #         subject: "🚨 CI/CD Falhou no Repositório ${{ github.repository }}"
+  #         body: |
+  #           O pipeline falhou na etapa: ${{ github.job }}
+  #           Commit: ${{ github.sha }}
+  #           Autor: ${{ github.actor }}
+  #           Veja mais detalhes: https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}
+  #         to: gabizinha477@gmail.com,gabrieladantasvasconcelos@gmail.com #${{ secrets.EMAIL_DEV }}
+  #         from: notifications@github.com   # ${{ secrets.EMAIL_USERNAME }}  #   
