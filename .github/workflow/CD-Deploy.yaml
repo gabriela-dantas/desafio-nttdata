@@ -18,27 +18,36 @@ jobs:
       - name: Checkout do código
         uses: actions/checkout@v4
 
-      - name: Hello World
-        run: echo Hello, world!
+      - name: Instalar dependências
+        run: npm install
 
-      # - name: Instalar dependências
-      #   run: npm install
+      - name: Executar testes
+        run: npm test
 
-      # - name: Executar testes
-      #   run: npm test
+      - name: Construir aplicação
+        run: npm run build
 
-      # - name: Construir aplicação
-      #   run: npm run build
+      - name: Criar Release no GitHub
+        uses: softprops/action-gh-release@v1
+        with:
+          tag_name: v1.0.${{ github.run_number }}
+          name: "Release v1.0.${{ github.run_number }}"
+          draft: false
+          prerelease: false
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      
 
-      # - name: Criar Release no GitHub
-      #   uses: softprops/action-gh-release@v1
-      #   with:
-      #     tag_name: v1.0.${{ github.run_number }}
-      #     name: "Release v1.0.${{ github.run_number }}"
-      #     draft: false
-      #     prerelease: false
-      #   env:
-      #     GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+ 
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment: github-pages
+
+    steps:
+      - name: Checkout do código
+        uses: actions/checkout@v4
       
       - name: Send mail
         if: always()
@@ -59,24 +68,14 @@ jobs:
           # from email name
           from: John Doe
 
- 
-  # deploy:
-  #   needs: build
-  #   runs-on: ubuntu-latest
-  #   environment: github-pages
+      - name: Configurar GitHub Pages
+        uses: actions/configure-pages@v3
 
-  #   steps:
-  #     - name: Checkout do código
-  #       uses: actions/checkout@v4
-
-  #     - name: Configurar GitHub Pages
-  #       uses: actions/configure-pages@v3
-
-  #     - name: Fazer Deploy no GitHub Pages (branch main)
-  #       uses: peaceiris/actions-gh-pages@v3
-  #       with:
-  #         github_token: ${{ secrets.GITHUB_TOKEN }}
-  #         #publish_dir: ./docs
+      - name: Fazer Deploy no GitHub Pages (branch main)
+        uses: peaceiris/actions-gh-pages@v3
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          #publish_dir: ./docs
 
 
       
