@@ -26,12 +26,12 @@ jobs:
           server_port: 587
          # username: ${{ secrets.EMAIL_USERNAME }}
           #password: ${{ secrets.EMAIL_PASSWORD }}
-          subject: "🚨 CI/CD Falhou no Repositório ${{ github.repository }}"
-          body: |
-            O pipeline falhou na etapa: ${{ github.job }}
-            Commit: ${{ github.sha }}
-            Autor: ${{ github.actor }}
-            Veja mais detalhes: https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}
+          subject: "🚨 CI/CD Falhou no Repositório"
+          # body: |
+          #   O pipeline falhou na etapa: ${{ github.job }}
+          #   Commit: ${{ github.sha }}
+          #   Autor: ${{ github.actor }}
+          #   Veja mais detalhes: https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}
           to: gabizinha477@gmail.com #${{ secrets.EMAIL_DEV }}
           from: notifications@github.com #${{ secrets.EMAIL_USERNAME }}
 
