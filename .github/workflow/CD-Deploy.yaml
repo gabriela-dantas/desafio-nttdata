@@ -2,85 +2,60 @@ name: Deploy Page React Hello World
 
 on:
   push:
-    branches:
-      - main
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
 
-permissions:
-  id-token: write
-  contents: write
+env:
+  CI: false
 
 jobs:
   build:
+
     runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    
+    permissions:
+      contents: 'read'
+      id-token: 'write'
+      pages: 'write'
+      actions: 'write'
+      checks: 'write'
+      deployments: 'write'
+    strategy:
+      matrix:
+        node-version: [18.x]
+        # See supported Node.js release schedule at https://nodejs.org/en/about/releases/
 
     steps:
-      - name: Checkout do código
-        uses: actions/checkout@v4
-
-      - name: Instalar dependências
-        run: npm install
-
-      - name: Executar testes
-        run: npm test
-
-      - name: Construir aplicação
-        run: npm run build
-
-      - name: Renomear build para docs
-        run: |
-          mv build docs
-          touch docs/.nojekyll  # Desativando Jekyll
-
-      - name: Verificar conteúdo da pasta docs
-        run: ls -l docs
-
-      - name: Armazenar arquivos da build
-        uses: actions/upload-artifact@v4
-        with:
-          name: react-app
-          path: docs
-
-  deploy:
-    needs: build
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout do código
-        uses: actions/checkout@v4
-
-      - name: Baixar build gerada no job build
-        uses: actions/download-artifact@v4
-        with:
-          name: react-app
-          path: docs
-
-      - name: Verificar conteúdo da pasta docs
-        run: ls -l docs
-
-      - name: Publicar no GitHub Pages (sem Jekyll)
-        uses: peaceiris/actions-gh-pages@v3
-        with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-          publish_dir: ./docs
-          keep_files: true
-          allow_empty_commit: true
-
-  notify_failure:
-    if: ${{ failure() }}
-    runs-on: ubuntu-latest
-    needs: [build, deploy]
-    steps:
-      - name: Enviar e-mail em caso de falha
-        uses: dawidd6/action-send-mail@v4
-        with:
-          server_address: smtp.gmail.com
-          server_port: 587
-          username: ${{ secrets.EMAIL_USERNAME }}
-          password: ${{ secrets.EMAIL_PASSWORD }}
-          subject: "🚨 CI/CD Falhou no Repositório ${{ github.repository }}"
-          body: |
-            O pipeline falhou na etapa: ${{ github.job }}
-            Commit: ${{ github.sha }}
-            Autor: ${{ github.actor }}
-            Veja mais detalhes: https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}
-          to: gabizinha477@gmail.com,gabrieladantasvasconcelos@gmail.com #${{ secrets.EMAIL_DEV }}
-          from: notifications@github.com
+    - uses: actions/checkout@v3
+    - name: Use Node.js ${{ matrix.node-version }}
+      uses: actions/setup-node@v3
+      with:
+        node-version: ${{ matrix.node-version }}
+        cache: 'npm'
+    - name: Install dependencies
+      # Using npm ci is generally faster than running npm i because it caches dependencies
+      run: |
+        npm ci
+    - name: Build the app
+      run: |
+        npm run build
+    - name: Run component tests
+      run: |
+        npm run test
+        
+    - name: Setup Pages
+      uses: actions/configure-pages@v3
+    - name: Upload artifact
+      uses: actions/upload-pages-artifact@v1
+      with:
+        # Upload build directory content
+        path: 'build/'
+    - name: Deploy to GitHub Pages
+      id: deployment
+      uses: actions/deploy-pages@v1
+      env:  
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
