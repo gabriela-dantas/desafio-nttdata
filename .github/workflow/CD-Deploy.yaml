@@ -16,17 +16,20 @@ jobs:
     steps:
       - name: Checkout do código
         uses: actions/checkout@v4
-        
-      - name: Install Node.js and npm
+
+      - name: Configurar Node.js
         uses: actions/setup-node@v3
         with:
-          node-version: '16'
+          node-version: '16'  # ou a versão específica que você está usando
+
+      - name: Limpar cache do npm
+        run: npm cache clean --force
 
       - name: Instalar dependências
-        run: npm install
+        run: npm install --production  # Usa dependências de produção apenas
 
       - name: Executar testes
-        run: npm test
+        run: npm test -- --verbose  # Habilita verbose para capturar mais detalhes
 
       - name: Construir aplicação
         run: npm run build
