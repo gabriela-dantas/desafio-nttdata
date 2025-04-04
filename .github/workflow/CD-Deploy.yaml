@@ -17,6 +17,24 @@ jobs:
       - name: Checkout do código
         uses: actions/checkout@v4
 
+      - name: Enviar e-mail em caso de falha
+        if: failure()
+        uses: dawidd6/action-send-mail@v4
+        with:
+         # connection_url: ${{secrets.MAIL_CONNECTION}}
+          server_address: smtp.gmail.com
+          server_port: 587
+         # username: ${{ secrets.EMAIL_USERNAME }}
+          #password: ${{ secrets.EMAIL_PASSWORD }}
+          subject: "🚨 CI/CD Falhou no Repositório ${{ github.repository }}"
+          body: |
+            O pipeline falhou na etapa: ${{ github.job }}
+            Commit: ${{ github.sha }}
+            Autor: ${{ github.actor }}
+            Veja mais detalhes: https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}
+          to: gabrieladantasvasconcelos@gmail.com #${{ secrets.EMAIL_DEV }}
+          from: notifications@github.com #${{ secrets.EMAIL_USERNAME }}
+
       - name: Instalar dependências
         run: npm install
 
@@ -36,24 +54,7 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Enviar e-mail em caso de falha
-        if: failure()
-        uses: dawidd6/action-send-mail@v4
-        with:
-         # connection_url: ${{secrets.MAIL_CONNECTION}}
-          server_address: smtp.gmail.com
-          server_port: 587
-         # username: ${{ secrets.EMAIL_USERNAME }}
-          #password: ${{ secrets.EMAIL_PASSWORD }}
-          subject: "🚨 CI/CD Falhou no Repositório ${{ github.repository }}"
-          body: |
-            O pipeline falhou na etapa: ${{ github.job }}
-            Commit: ${{ github.sha }}
-            Autor: ${{ github.actor }}
-            Veja mais detalhes: https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}
-          to: gabizinha477@gmail.com #${{ secrets.EMAIL_DEV }}
-          from: notifications@github.com #${{ secrets.EMAIL_USERNAME }}
-
+ 
   deploy:
     needs: build
     runs-on: ubuntu-latest
