@@ -3,8 +3,7 @@ name: Deploy Page React Hello World
 on:
   push:
     branches: [ "main" ]
-  pull_request:
-    branches: [ "main" ]
+
 
 env:
   CI: false
@@ -20,14 +19,14 @@ jobs:
     permissions:
       contents: 'read'
       id-token: 'write'
-      pages: 'write'
-      actions: 'write'
-      checks: 'write'
-      deployments: 'write'
+     # pages: 'write'
+     # actions: 'write'
+     # checks: 'write'
+     # deployments: 'write'
     strategy:
       matrix:
         node-version: [18.x]
-        # See supported Node.js release schedule at https://nodejs.org/en/about/releases/
+
 
     steps:
     - uses: actions/checkout@v3
@@ -47,19 +46,6 @@ jobs:
       run: |
         npm run test
         
-    - name: Setup Pages
-      uses: actions/configure-pages@v3
-    - name: Upload artifact
-      uses: actions/upload-pages-artifact@v1
-      with:
-        # Upload build directory content
-        path: 'build/'
-    - name: Deploy to GitHub Pages
-      id: deployment
-      uses: actions/deploy-pages@v1
-      env:  
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
     - name: Send mail
       if: always()
       uses: dawidd6/action-send-mail@v2
@@ -78,3 +64,18 @@ jobs:
         to: gabizinha477@gmail.com,gabrieladantasvasconcelos@gmail.com
         # from email name
         from: John Doe
+
+    - name: Setup Pages
+      uses: actions/configure-pages@v3
+    - name: Upload artifact
+      uses: actions/upload-pages-artifact@v1
+      with:
+        # Upload build directory content
+        path: 'build/'
+    - name: Deploy to GitHub Pages
+      id: deployment
+      uses: actions/deploy-pages@v1
+      env:  
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+   
