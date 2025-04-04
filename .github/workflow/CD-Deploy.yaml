@@ -36,16 +36,26 @@ jobs:
         node-version: ${{ matrix.node-version }}
         cache: 'npm'
     - name: Install dependencies
-      # Using npm ci is generally faster than running npm i because it caches dependencies
+     # Usar npm ci é geralmente mais rápido do que executar npm i porque armazena dependências em cache
       run: |
         npm ci
-    - name: Build the app
+    - name: Instalar dependências
       run: |
         npm run build
-    - name: Run component tests
+    - name: Executar testes
       run: |
         npm run test
-        
+    
+    - name: Criar Release no GitHub
+      uses: softprops/action-gh-release@v1
+      with:
+        tag_name: v1.0.${{ github.run_number }}
+        name: "Release v1.0.${{ github.run_number }}"
+        draft: false
+        prerelease: false
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}  
+
     - name: Send mail
       if: always()
       uses: dawidd6/action-send-mail@v2
