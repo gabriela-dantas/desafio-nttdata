@@ -43,8 +43,8 @@ jobs:
          # connection_url: ${{secrets.MAIL_CONNECTION}}
           server_address: smtp.gmail.com
           server_port: 587
-          username: ${{ secrets.EMAIL_USERNAME }}
-          password: ${{ secrets.EMAIL_PASSWORD }}
+         # username: ${{ secrets.EMAIL_USERNAME }}
+          #password: ${{ secrets.EMAIL_PASSWORD }}
           subject: "🚨 CI/CD Falhou no Repositório ${{ github.repository }}"
           body: |
             O pipeline falhou na etapa: ${{ github.job }}
@@ -52,7 +52,7 @@ jobs:
             Autor: ${{ github.actor }}
             Veja mais detalhes: https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}
           to: gabizinha477@gmail.com #${{ secrets.EMAIL_DEV }}
-          from: gabrieladantasvasconcelos@gmail.com #${{ secrets.EMAIL_USERNAME }}
+          from: notifications@github.com #${{ secrets.EMAIL_USERNAME }}
 
   deploy:
     needs: build
