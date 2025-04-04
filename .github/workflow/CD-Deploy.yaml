@@ -16,6 +16,11 @@ jobs:
     steps:
       - name: Checkout do código
         uses: actions/checkout@v4
+        
+      - name: Install Node.js and npm
+        uses: actions/setup-node@v3
+        with:
+          node-version: '16'
 
       - name: Instalar dependências
         run: npm install
