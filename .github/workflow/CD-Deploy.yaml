@@ -62,17 +62,17 @@ jobs:
     needs: [build, deploy] # Garante que será executado se qualquer um dos jobs falhar
     steps:
       - name: Enviar e-mail em caso de falha
-        uses: dawidd6/action-send-mail@v3
+        uses: dawidd6/action-send-mail@v4
         with:
           server_address: smtp.gmail.com
           server_port: 587
           username: ${{ secrets.EMAIL_USERNAME }}
           password: ${{ secrets.EMAIL_PASSWORD }}
-          subject: "🚨 CI/CD Falhou no Repositório ${{ github.repository }}"
-          body: |
-            O pipeline falhou na etapa: ${{ github.job }}
-            Commit: ${{ github.sha }}
-            Autor: ${{ github.actor }}
-            Veja mais detalhes: https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}
+          subject: "🚨 CI/CD Falhou no Repositório " # ${{ github.repository }}
+          # body: |
+          #   O pipeline falhou na etapa: ${{ github.job }}
+          #   Commit: ${{ github.sha }}
+          #   Autor: ${{ github.actor }}
+          #   Veja mais detalhes: https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}
           to: gabizinha477@gmail.com #${{ secrets.EMAIL_DEV }}
           from: ${{ secrets.EMAIL_USERNAME }}  #notifications@github.com     
