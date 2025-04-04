@@ -19,10 +19,10 @@ jobs:
     permissions:
       contents: 'read'
       id-token: 'write'
-     # pages: 'write'
-     # actions: 'write'
-     # checks: 'write'
-     # deployments: 'write'
+      pages: 'write'
+      actions: 'write'
+      checks: 'write'
+      deployments: 'write'
     strategy:
       matrix:
         node-version: [18.x]
