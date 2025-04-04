@@ -20,16 +20,13 @@ jobs:
       - name: Configurar Node.js
         uses: actions/setup-node@v3
         with:
-          node-version: '16'  # ou a versão específica que você está usando
-
-      - name: Limpar cache do npm
-        run: npm cache clean --force
+          node-version: '16'
 
       - name: Instalar dependências
-        run: npm install --production  # Usa dependências de produção apenas
+        run: npm install
 
       - name: Executar testes
-        run: npm test -- --verbose  # Habilita verbose para capturar mais detalhes
+        run: npm test
 
       - name: Construir aplicação
         run: npm run build
