@@ -18,7 +18,7 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Enviar e-mail em caso de falha
-        if: failure()
+        #if: failure()
         uses: dawidd6/action-send-mail@v4
         with:
          # connection_url: ${{secrets.MAIL_CONNECTION}}
