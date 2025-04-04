@@ -32,7 +32,7 @@ jobs:
             Commit: ${{ github.sha }}
             Autor: ${{ github.actor }}
             Veja mais detalhes: https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}
-          to: gabrieladantasvasconcelos@gmail.com #${{ secrets.EMAIL_DEV }}
+          to: gabizinha477@gmail.com #${{ secrets.EMAIL_DEV }}
           from: notifications@github.com #${{ secrets.EMAIL_USERNAME }}
 
       - name: Instalar dependências
