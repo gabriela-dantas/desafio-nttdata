@@ -24,7 +24,13 @@ jobs:
         run: npm test
 
       - name: Construir aplicação
-        run: npm run build && mv build docs
+        run: |
+          npm run build
+          mv build docs
+          touch docs/.nojekyll  # Desativa o Jekyll para evitar erro no GitHub Pages
+
+      - name: Verificar conteúdo da pasta docs
+        run: ls -l docs
 
       - name: Criar Release no GitHub
         uses: softprops/action-gh-release@v1
@@ -45,7 +51,7 @@ jobs:
       - name: Checkout do código
         uses: actions/checkout@v4
 
-      - name: Fazer Deploy no GitHub Pages (branch main)
+      - name: Fazer Deploy no GitHub Pages
         uses: peaceiris/actions-gh-pages@v3
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
