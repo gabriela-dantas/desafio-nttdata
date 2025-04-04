@@ -52,7 +52,7 @@ jobs:
       #     # email body as text
       #     body: ${{ github.job }} job in worflow ${{ github.workflow }} of ${{ github.repository }} has ${{ job.status }}
       #     # comma-separated string, send email to
-      #     to: gabizinha477@gmail.com, gabrieladantasvasconcelos@gmail.com
+      #     to: gabizinha477@gmail.com,gabrieladantasvasconcelos@gmail.com
       #     # from email name
       #     from: John Doe
 
@@ -78,7 +78,7 @@ jobs:
 
       
   notify_failure:
-    if: ${{ failure() }}
+    if: ${{ always() }}
     runs-on: ubuntu-latest
     needs: [build, deploy] # Garante que será executado se qualquer um dos jobs falhar
     steps:
@@ -95,5 +95,5 @@ jobs:
             Commit: ${{ github.sha }}
             Autor: ${{ github.actor }}
             Veja mais detalhes: https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}
-          to: gabizinha477@gmail.com #${{ secrets.EMAIL_DEV }}
+          to: gabizinha477@gmail.com,gabrieladantasvasconcelos@gmail.com #${{ secrets.EMAIL_DEV }}
           from: notifications@github.com   # ${{ secrets.EMAIL_USERNAME }}  #   
