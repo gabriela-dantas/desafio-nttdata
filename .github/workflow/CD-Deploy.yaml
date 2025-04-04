@@ -7,8 +7,7 @@ on:
 
 permissions:
   id-token: write
-  contents: read
-
+  contents: write
 
 jobs:
   build:
@@ -17,22 +16,15 @@ jobs:
     steps:
       - name: Checkout do código
         uses: actions/checkout@v4
-      
-      - name: Configurar Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: 18
 
       - name: Instalar dependências
         run: npm install
-        continue-on-error: true # capturar erros nesse step
-
 
       - name: Executar testes
         run: npm test
 
       - name: Construir aplicação
-        run: npm run build
+        run: npm run build && mv build docs
 
       - name: Criar Release no GitHub
         uses: softprops/action-gh-release@v1
@@ -43,10 +35,7 @@ jobs:
           prerelease: false
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      
 
-
- 
   deploy:
     needs: build
     runs-on: ubuntu-latest
@@ -56,38 +45,16 @@ jobs:
       - name: Checkout do código
         uses: actions/checkout@v4
 
-      - name: Configurar GitHub Pages
-        uses: actions/configure-pages@v3
-
-      # - name: Send mail
-      #   if: always()
-      #   uses: dawidd6/action-send-mail@v2
-      #   with:
-      #     # mail server settings
-      #     server_address: smtp.gmail.com
-      #     server_port: 465
-      #     # user credentials
-      #     username: ${{ secrets.EMAIL_USERNAME }}
-      #     password: ${{ secrets.EMAIL_PASSWORD }}
-      #     # email subject
-      #     subject: ${{ github.job }} job of ${{ github.repository }} has ${{ job.status }}
-      #     # email body as text
-      #     body: ${{ github.job }} job in worflow ${{ github.workflow }} of ${{ github.repository }} has ${{ job.status }}
-      #     # comma-separated string, send email to
-      #     to: gabizinha477@gmail.com,gabrieladantasvasconcelos@gmail.com
-      #     # from email name
-      #     from: John Doe
-
       - name: Fazer Deploy no GitHub Pages (branch main)
         uses: peaceiris/actions-gh-pages@v3
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
-          #publish_dir: ./docs
-
+          publish_dir: ./docs
 
   notify_failure:
-    if: failure()
+    if: ${{ failure() }}
     runs-on: ubuntu-latest
+    needs: [build, deploy]
     steps:
       - name: Enviar e-mail em caso de falha
         uses: dawidd6/action-send-mail@v4
@@ -102,5 +69,5 @@ jobs:
             Commit: ${{ github.sha }}
             Autor: ${{ github.actor }}
             Veja mais detalhes: https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}
-          to: gabizinha477@gmail.com,gabrieladantasvasconcelos@gmail.com #${{ secrets.EMAIL_DEV }}
+          to: ${{ secrets.EMAIL_DEV }}
           from: notifications@github.com
