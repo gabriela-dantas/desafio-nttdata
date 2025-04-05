@@ -5,8 +5,18 @@ on:
     branches: [ "main" ]
 
 
-env:
-  CI: false
+# Permite que você execute este fluxo de trabalho manualmente na guia Ações
+workflow_dispatch:
+
+  permissions:
+      contents: 'read'
+      id-token: 'write'
+      pages: 'write'
+
+# Permitir apenas uma implantação simultânea, ignorando as execuções na fila entre a execução em andamento e a última na fila.
+concurrency:
+  group: "pages"
+  cancel-in-progress: false
 
 jobs:
   sonarqube:
@@ -25,77 +35,79 @@ jobs:
     #   name: github-pages
     #   url: ${{ steps.deployment.outputs.page_url }}
     
-    permissions:
-      contents: 'read'
-      id-token: 'write'
-      pages: 'write'
-      actions: 'write'
-      checks: 'write'
-      deployments: 'write'
-    strategy:
-      matrix:
-        node-version: [18.x]
+
+  build:
+    permissions: write-all
+    needs: sonarcloud
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+        # Instalação de dependências, testes, construção e deploy.
+
+      - name: Instalação do Node.js 18.x
+        uses: actions/setup-node@v3
+        with:
+          node-version: '18.x'
 
 
+      - uses: actions/checkout@v3
+      - name: Use Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v3
+        with:
+          node-version: ${{ matrix.node-version }}
+          cache: 'npm'
+      - name: Install dependencies
+      # Usar npm ci é geralmente mais rápido do que executar npm i porque armazena dependências em cache
+        run: |
+          npm ci
+      - name: Instalar dependências
+        run: |
+          npm run build
+      - name: Executar testes
+        run: |
+          npm run test
+      
+      - name: Criar Release no GitHub
+        uses: softprops/action-gh-release@v1
+        with:
+          tag_name: v1.0.${{ github.run_number }}
+          name: "Release v1.0.${{ github.run_number }}"
+          draft: false
+          prerelease: false
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}  
 
-  steps:
-    - uses: actions/checkout@v3
-    - name: Use Node.js ${{ matrix.node-version }}
-      uses: actions/setup-node@v3
-      with:
-        node-version: ${{ matrix.node-version }}
-        cache: 'npm'
-    - name: Install dependencies
-     # Usar npm ci é geralmente mais rápido do que executar npm i porque armazena dependências em cache
-      run: |
-        npm ci
-    - name: Instalar dependências
-      run: |
-        npm run build
-    - name: Executar testes
-      run: |
-        npm run test
-    
-    - name: Criar Release no GitHub
-      uses: softprops/action-gh-release@v1
-      with:
-        tag_name: v1.0.${{ github.run_number }}
-        name: "Release v1.0.${{ github.run_number }}"
-        draft: false
-        prerelease: false
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}  
-
-    - name: Send mail
-      if: always()
-      uses: dawidd6/action-send-mail@v2
-      with:
-        # mail server settings
-        server_address: smtp.gmail.com
-        server_port: 465
-        # user credentials
-        username: ${{ secrets.EMAIL_USERNAME }}
-        password: ${{ secrets.EMAIL_PASSWORD }}
-        # email subject
-        subject: ${{ github.job }} job of ${{ github.repository }} has ${{ job.status }}
-        # email body as text
-        body: ${{ github.job }} job in worflow ${{ github.workflow }} of ${{ github.repository }} has ${{ job.status }}
-        # comma-separated string, send email to
-        to: gabizinha477@gmail.com,gabrieladantasvasconcelos@gmail.com
-        # from email name
-        from: John Doe
-
-    - name: Setup Pages
-      uses: actions/configure-pages@v3
-    - name: Upload artifact
-      uses: actions/upload-pages-artifact@v1
-      with:
-        # Upload build directory content
-        path: 'build/'
-    - name: Deploy to GitHub Pages
-      id: deployment
-      uses: actions/deploy-pages@v1
-      env:  
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: Setup Pages
+        uses: actions/configure-pages@v3
+      - name: Upload artifact
+        uses: actions/upload-pages-artifact@v1
+        with:
+          # Upload build directory content
+          path: 'build/'
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v1
+        env:  
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
    
+    #  - name: Send mail
+    #     if: always()
+    #     uses: dawidd6/action-send-mail@v2
+    #     with:
+    #       # mail server settings
+    #       server_address: smtp.gmail.com
+    #       server_port: 465
+    #       # user credentials
+    #       username: ${{ secrets.EMAIL_USERNAME }}
+    #       password: ${{ secrets.EMAIL_PASSWORD }}
+    #       # email subject
+    #       subject: ${{ github.job }} job of ${{ github.repository }} has ${{ job.status }}
+    #       # email body as text
+    #       body: ${{ github.job }} job in worflow ${{ github.workflow }} of ${{ github.repository }} has ${{ job.status }}
+    #       # comma-separated string, send email to
+    #       to: gabizinha477@gmail.com,gabrieladantasvasconcelos@gmail.com
+    #       # from email name
+    #       from: John Doe
